@@ -5,7 +5,8 @@ CURRENT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 MEGATRON_PATCH_PATH=$( dirname $( dirname ${CURRENT_DIR}))
 echo ${MEGATRON_PATCH_PATH}
-export PYTHONPATH=$PYTHONPATH:${MEGATRON_PATCH_PATH}:${MEGATRON_PATCH_PATH}/backends/megatron/Megatron-LM-250328
+export PYTHONPATH=${MEGATRON_PATCH_PATH}:/mnt/seed-program-nas/001688/caizhi/qwen3_train/Megatron-LM:/mnt/seed-program-nas/001688/caizhi/qwen3_train/megatron-lm-musa-patch:$PYTHONPATH:
+#export PYTHONPATH=/mnt/seed-program-nas/001688/caizhi/qwen3_train/Megatron-LM:$PYTHONPATH:${MEGATRON_PATCH_PATH}
 
 input_data_dir=$1
 tokenizer=$2
