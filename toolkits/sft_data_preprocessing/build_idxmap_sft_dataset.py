@@ -25,6 +25,7 @@ import multiprocessing
 
 from megatron.core.datasets import indexed_dataset
 from megatron_patch.tokenizer import build_tokenizer
+import musa_patch
 
 class Encoder(object):
     def __init__(self, args):

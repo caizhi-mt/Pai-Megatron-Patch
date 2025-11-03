@@ -26,6 +26,7 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     Qwen2MoeForCausalLM,
+    Qwen3MoeForCausalLM,
 )
 
 from megatron.training.initialize import initialize_megatron
@@ -43,6 +44,7 @@ from toolkits.model_checkpoints_convertor.utils import (
 )
 
 from megatron.core.models.gpt import GPTModel
+from megatron.core import parallel_state as mpu
 
 
 torch.backends.cudnn.deterministic = True
@@ -166,7 +168,13 @@ def load_megatron_model(args):
     # os.system("cp -rf " + args.hf_ckpt_path + "/*.py " + args.load)
     os.system("cp -rf " + args.hf_ckpt_path + "/vocab.json " + args.load)
     os.system("cp -rf " + args.hf_ckpt_path + "/merges.txt " + args.load)
-    model = model_provider()
+    #model = model_provider()
+    from pretrain_gpt import model_provider
+    pp_rank, pp_size = mpu.get_pipeline_model_parallel_rank(), args.pipeline_model_parallel_size
+    pre_process = True if pp_rank == 0 else False
+    post_process = True if pp_rank == pp_size - 1 else False
+    model_provider_func = model_provider
+    model = model_provider_func(pre_process, post_process)
 
 
     args.tensor_model_parallel_size = args.target_tensor_model_parallel_size
@@ -453,7 +461,7 @@ def convert_checkpoint_from_megatron_to_transformers(mgmodel, hfmodel, args):
             hfmodel.lm_head.weight.copy_(mgmodel.output_layer.weight)
 
 
-def convert_checkpoint_from_transformers_to_megatron(hfmodel: Qwen2MoeForCausalLM, mgmodel: GPTModel, args):
+def convert_checkpoint_from_transformers_to_megatron(hfmodel: Qwen3MoeForCausalLM, mgmodel: GPTModel, args):
 
     if args.fp16:
         mgmodel = mgmodel.half()

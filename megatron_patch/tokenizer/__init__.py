@@ -246,6 +246,9 @@ def build_tokenizer(args):
             def eos_token_id(self):
                 return self.tokenizer.eos_token_id
 
+        # =========================
+        args.padded_vocab_size = 0
+        # =========================
         tokenizer = _Qwen2Tokenizer(args.load, args.extra_vocab_size, args.padded_vocab_size)
         if args.padded_vocab_size == 0:
             args.padded_vocab_size = tokenizer.vocab_size
